@@ -31,6 +31,8 @@ def mock_llm(messages):
 
 @pytest.fixture(autouse=True)
 def _mocks():
+    from app.services import cache as qcache
+    qcache.clear_memory()
     CALLS["n"] = 0
     STATE.update({"grades": [{"id": 1, "score": 0.9, "reason": "topical"}],
                   "critics": [{"faithful": 5, "complete": 5, "cited": True, "issues": []}],

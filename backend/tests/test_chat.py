@@ -23,6 +23,8 @@ def mock_llm(messages):
 
 @pytest.fixture(autouse=True)
 def _mocks():
+    from app.services import cache as qcache
+    qcache.clear_memory()
     llm.set_mock(mock_llm)
     yield
     llm.set_mock(mock_llm)

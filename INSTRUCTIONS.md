@@ -61,9 +61,10 @@ LLM answers take ~20s on CPU (8B Q4). Hash-embedding fallback engages only if Ol
 Repeat a question to see `cached:true` + tier (`exact`/`semantic`) and zero new LLM latency; `GET /api/admin/stats` shows hit-rate.
 Regenerate fresh with `"fresh": true` in the chat body.
 Agent mode: `"mode": "agent"` in the chat body → streams `node` events (RETRIEVE/GRADE/REWRITE/GENERATE/CRITIQUE/REFLECT) with full trace persisted per message.
+Feedback: `POST /api/feedback {message_id, rating, comment?, corrected_answer?}` → nightly `python scripts/rollup_feedback.py [--write-candidates]`.
 
 ## Notes
 
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
-- Current status: **Plan 06 done** (self-reflective agent: grade/rewrite/critique/reflect with traces). Feedback + full UI arrive in Plans 07–08.
+- Current status: **Plan 07 done** (feedback API + rollup + dashboard helpfulness). Only full UI remains in Plan 08.
