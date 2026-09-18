@@ -18,9 +18,10 @@ build/
 .npm/
 
 # Data / models (never commit blobs or embeddings)
-data/uploads/
-data/processed/
-data/cache/
+**/data/uploads/
+**/data/processed/
+**/data/cache/
+data/
 *.pdf
 *.docx
 *.pptx
