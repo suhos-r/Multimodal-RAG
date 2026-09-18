@@ -30,13 +30,17 @@
    npm run dev
    ```
    Open `http://localhost:3000/login`.
+   Routes: `/login` → `/chat` (sidebar: sessions/knowledge/admin) → `/chat/[id]` thread with
+   streaming + clickable `[n]` citations + thumbs/copy/regenerate/report → `/knowledge` uploader
+   → `/admin` hit-rate/latency/helpfulness. Typecheck: `npx tsc --noEmit`. Prod build: `npm run build`.
 
 ## Demo in order (2 min)
 
 1. Signup at `/login` (any email, password min 8) → you land on chat.
-2. Upload a file: `POST /api/documents/upload` (use `/docs` → authorize with JWT) with any `.txt/.pdf/.csv/.png/.mp3` → trigger `POST /api/documents/{id}/process` (worker does this automatically in prod) → poll `GET /api/documents/{id}/status` until `ready`.
-3. Chat (Plan 04+, not yet): ask a question → cited answer streams.
-4. Re-ask same question → served from cache `<300ms` with `cached:true` badge.
+2. Upload files at `/knowledge` (any `.txt/.pdf/.csv/.png/.mp3`, 100MB cap) → status polls to `ready`.
+3. Ask in the thread → answer streams with clickable citations `[1]` → popover shows quote + file + page + Open source. Toggle `agent` mode for the self-reflective loop (node badges show progress).
+4. Thumbs up/down, copy, regenerate (fresh), report/correct under every answer. Re-ask a question → `cached` badge, no LLM call.
+5. `/admin` shows hit-rate, LLM calls avoided, latency, helpfulness.
 
 ## Evals (no servers needed)
 
@@ -67,4 +71,4 @@ Feedback: `POST /api/feedback {message_id, rating, comment?, corrected_answer?}`
 
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
-- Current status: **Plan 07 done** (feedback API + rollup + dashboard helpfulness). Only full UI remains in Plan 08.
+- Current status: **Plans 01–08 complete** (auth/sessions, multimodal ingestion, chunking bench, cited chat, cache, agent, feedback, full UI). Remaining: Plan 09 hardening (rate-limit global, CI eval gate) + Plan 10 compose deploy — out of the requested 4–8 scope.

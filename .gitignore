@@ -16,6 +16,7 @@ dist/
 build/
 *.log
 .npm/
+tsconfig.tsbuildinfo
 
 # Data / models (never commit blobs or embeddings)
 **/data/uploads/

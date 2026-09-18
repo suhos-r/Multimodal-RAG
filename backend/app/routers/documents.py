@@ -87,6 +87,17 @@ async def doc_status(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db), user
     return {"status": doc.status, "progress": progress, "error": doc.error, "page_count": doc.page_count}
 
 
+@router.get("/{doc_id}/download")
+async def download_doc(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db), user_id: str = Depends(get_current_user)):
+    from fastapi.responses import FileResponse
+    doc = (await db.execute(select(Document).where(Document.id == doc_id))).scalar_one_or_none()
+    if doc is None or str(doc.owner_id) != user_id:
+        raise HTTPException(404, "document not found")
+    if not Path(doc.blob_path).exists():
+        raise HTTPException(410, "blob no longer stored")
+    return FileResponse(doc.blob_path, filename=doc.filename, media_type=doc.mime)
+
+
 @router.delete("/{doc_id}", status_code=204)
 async def delete_doc(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db), user_id: str = Depends(get_current_user)):
     doc = (await db.execute(select(Document).where(Document.id == doc_id))).scalar_one_or_none()

@@ -81,3 +81,18 @@ async def test_unsupported_rejected():
         r = await c.post("/api/documents/upload", headers=h,
                          files={"file": ("x.exe", b"mz", "application/octet-stream")}, data={"scope": "private"})
         assert r.status_code == 415
+
+
+async def test_download_roundtrip_and_isolation():
+    async with client() as c:
+        a = await _signup(c, "dla@x.com")
+        b = await _signup(c, "dlb@x.com")
+        ha = {"Authorization": f"Bearer {a['access_token']}"}
+        hb = {"Authorization": f"Bearer {b['access_token']}"}
+        r = await c.post("/api/documents/upload", headers=ha,
+                         files={"file": ("hello.txt", b"hello download", "text/plain")}, data={"scope": "private"})
+        d = r.json()["doc_id"]
+        r = await c.get(f"/api/documents/{d}/download", headers=ha)
+        assert r.status_code == 200 and r.content == b"hello download"
+        r = await c.get(f"/api/documents/{d}/download", headers=hb)
+        assert r.status_code == 404
