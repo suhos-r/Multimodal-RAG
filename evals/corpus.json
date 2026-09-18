@@ -1,0 +1,137 @@
+{
+  "kb_rag_guide": [
+    {
+      "page": 1,
+      "modality": "text",
+      "text": "Retrieval Augmented Generation (RAG) combines a retriever with a generator. The retriever fetches relevant chunks from a vector index, and the generator conditions its answer on them. The Zorblax protocol requires citations for every factual sentence. Vector indexes come in several flavors. HNSW graphs give fast approximate nearest neighbor search with high recall. IVF indexes partition vectors into clusters for memory efficiency. Product quantization compresses vectors at some recall cost. Evaluation uses RAGAS metrics: faithfulness checks that claims are entailed by citations, answer relevancy scores topical match, and context precision measures ranking quality. A faithfulness gate of 0.80 blocks bad releases. For office catering, the cafeteria serves lunch from noon to 2pm with a rotating menu. This paragraph is intentionally unrelated to retrieval so that topic segmentation strategies have something to split on."
+    },
+    {
+      "page": 2,
+      "modality": "text",
+      "text": "Hybrid retrieval fuses dense embeddings with sparse BM25 scores using Reciprocal Rank Fusion with k=60. The top 20 candidates are then reranked with a cross-encoder down to the final 5 passages used for generation. BM25 itself scores term frequency saturation with parameters k1=1.2 and b=0.75. Dense models like BGE-M3 emit 1024-dimensional normalized vectors. Score fusion avoids either signal dominating. The company holiday party is in December with a white-elephant exchange. Parking validation is available at the front desk. Again, unrelated filler to create a second topic region inside this block."
+    },
+    {
+      "page": 3,
+      "modality": "text",
+      "text": "Chunk overlap of 150 tokens on an 800-token window is the default because it preserves sentence continuity across boundaries. Smaller overlaps risk cutting key phrases like the Meridian refund policy in half. Fixed-size chunking is the baseline: simple windows with overlap, no regard for semantics. Recursive splitting respects paragraph and sentence boundaries first. Semantic chunking places breakpoints where embedding similarity drops. The gym on level 2 opens at 6am. Laundry service pickup is on Thursdays. Filler ends here."
+    }
+  ],
+  "kb_refunds": [
+    {
+      "page": 1,
+      "modality": "text",
+      "text": "The Meridian refund policy allows returns within 30 days of purchase for a full refund. Digital goods are refundable within 14 days. After 30 days, store credit is issued instead of cash."
+    },
+    {
+      "page": 2,
+      "modality": "text",
+      "text": "To request a refund, customers must provide the order Kv-9042 receipt and the reason code. Refunds are processed within 5 business days to the original payment method."
+    }
+  ],
+  "pdf_q3_earnings": [
+    {
+      "page": 4,
+      "modality": "text",
+      "text": "Q3 revenue grew 12 percent year over year to 4.8 billion dollars, driven by the Nimbus cloud division. Operating margin expanded to 31 percent."
+    },
+    {
+      "page": 5,
+      "modality": "table",
+      "text": "Division | Q3 Revenue | YoY Growth\nNimbus Cloud | 2.1B | +22%\nHelios Hardware | 1.4B | +3%\nVesta Services | 1.3B | +9%"
+    },
+    {
+      "page": 6,
+      "modality": "text",
+      "text": "The board approved a dividend of 0.42 dollars per share, payable on November 15. The CFO attributed growth to the Kestrel acquisition completed in June."
+    }
+  ],
+  "slides_launch": [
+    {
+      "page": 1,
+      "modality": "text",
+      "text": "Slide 1: Project Falcon launch timeline. Beta opens March 3, general availability June 20, deprecation of legacy API on December 1."
+    },
+    {
+      "page": 2,
+      "modality": "text",
+      "text": "Slide 2: Pricing tiers. Starter is free up to 1000 queries, Pro is 49 dollars per month, Enterprise uses the Quartz contract with annual billing."
+    },
+    {
+      "page": 3,
+      "modality": "text",
+      "text": "Slide 3: Support SLAs. Pro incidents respond within 4 hours, Enterprise within 1 hour via the dedicated Hotline 7 channel."
+    }
+  ],
+  "img_office_map": [
+    {
+      "page": 1,
+      "modality": "image",
+      "text": "IMAGE floorplan.png: Office floor plan showing the Zephyr conference room next to the server closet on level 3. OCR: ZEPHYR - LEVEL 3 - MAX 12 PERSONS"
+    }
+  ],
+  "audio_allhands": [
+    {
+      "page": 1,
+      "modality": "audio",
+      "text": "All-hands transcript segment 1: The CEO announced the hiring freeze will lift in February, starting with the Atlas engineering team of 40 people."
+    },
+    {
+      "page": 2,
+      "modality": "audio",
+      "text": "All-hands transcript segment 2: The new parental leave policy grants 16 weeks fully paid, effective January 1, administered by the People Ops codename Banyan."
+    }
+  ],
+  "kb_security": [
+    {
+      "page": 1,
+      "modality": "text",
+      "text": "API keys must be rotated every 90 days per the Sable security standard. Keys are scoped per service and stored in the Vault under the service codename."
+    },
+    {
+      "page": 2,
+      "modality": "text",
+      "text": "Incident response severity levels: SEV-1 pages the on-call within 5 minutes, SEV-2 within 30 minutes, SEV-3 is handled next business day by the queue owner."
+    }
+  ],
+  "kb_deploy": [
+    {
+      "page": 1,
+      "modality": "text",
+      "text": "Deployments run every Tuesday and Thursday at 10am UTC via the Tern pipeline. A deploy freeze is in effect during the last week of December."
+    },
+    {
+      "page": 2,
+      "modality": "text",
+      "text": "Rollback procedure: run tern rollback --to <build-id>, then verify health endpoint returns ok within 5 minutes before announcing in channel ops-bridge."
+    }
+  ],
+  "kb_handbook": [
+    {
+      "page": 10,
+      "modality": "text",
+      "text": "Remote work policy. Employees classified as remote receive a home office allowance of 800 dollars per year for furniture and equipment. Allowance claims require receipts uploaded to the expenses portal under category Work-From-Home. Claims are reimbursed within 10 business days. Remote employees must maintain core overlap hours from 10am to 3pm Eastern for meetings. Timezone changes must be reported to People Ops within one week. The office plants are watered on Mondays by the facilities team. Coffee machine descaling happens monthly. The parking garage has 200 spaces with 10 reserved for visitors. Standing desks can be requested through the ergonomics form with manager approval. Monitor arms are standard issue in all offices. Keyboard trays require a doctor note for tax purposes. The annual picnic is held in July at Riverside Park with vegetarian options. Flu shot clinics run each October in the lobby. Blood donation drives happen quarterly. Expense reports must be filed within 30 days of purchase with itemized receipts. Mileage is reimbursed at the federal rate. Per diem does not apply to remote allowance claims. Performance reviews occur twice yearly in April and October with peer feedback. Promotion packets are due six weeks before review calibration. Calibration sessions last two hours. The IT helpdesk responds within 2 business hours for urgent tickets. Password resets are self-service through the portal. VPN access requires device certificates renewed yearly. All-hands meetings happen monthly on the first Friday with recordings posted afterward. Team offsites are budgeted at 150 dollars per person per quarter. Travel requests need two-week notice."
+    },
+    {
+      "page": 11,
+      "modality": "text",
+      "text": "Travel policy. The daily meal per-diem is 95 dollars for domestic travel and 130 dollars for international travel. Flights over 6 hours may be booked in premium economy with director approval. Hotel nightly cap is 220 dollars domestic and 300 dollars international. Rental cars require the corporate damage waiver; personal insurance is not reimbursed. Rideshares are preferred for trips under 30 miles. Conference attendance needs a written business justification submitted one month ahead. Proceedings must be shared afterward in a trip report. The library has 5000 volumes with borrowing periods of three weeks. Renewals are allowed twice online. Late fines are 25 cents per day. Bike storage is available in the basement with registration stickers. Showers are on level 1 for commuters. Towel service costs 5 dollars monthly. The mentorship program pairs new hires within their first two weeks. Mentors meet mentees biweekly for the first quarter. Feedback surveys go out monthly. Software licenses are managed centrally; requests take 3 business days. Open-source usage requires license review for copyleft code. Security training is annual and mandatory. The fire drill schedule is posted quarterly with wardens per floor. First aid kits are inspected monthly. Emergency exits must never be blocked for any reason. Holiday calendar follows the federal schedule plus two floating days. Floating days expire at year end without carryover. Requests need manager sign-off."
+    },
+    {
+      "page": 12,
+      "modality": "text",
+      "text": "Equipment policy. Company laptops are refreshed every 3 years automatically through the asset program. Early refresh requires VP approval with a documented business need. Retired devices must be wiped and returned within 14 days of replacement. Monitors up to 27 inches are standard; ultrawide monitors need manager approval. Docking stations are issued with every laptop automatically. The break room has two microwaves cleaned every Friday. Refrigerator cleanouts happen on the last Friday monthly. Unlabeled food is discarded. Desk hoteling uses the reservation app with check-in by 9am. No-show bookings are released after 30 minutes. Personal items must fit in lockers. The wellness stipend is 50 dollars monthly for gym or meditation apps. Claims need receipts with no approval below the cap. Unused amounts do not roll over. Code review requires two approvals before merge to main. CI must pass with 80 percent coverage on changed lines. Feature flags guard all user-facing changes. On-call rotations last one week with a 15-minute response SLA. Handoffs happen every Monday morning. Incident postmortems are due within 5 days. The data retention policy keeps logs for 13 months. Backups run nightly with weekly restore tests. Encryption at rest uses AES-256 throughout."
+    }
+  ],
+  "kb_distractors": [
+    {
+      "page": 1,
+      "modality": "text",
+      "text": "The cafeteria lunch menu rotates weekly between Italian, Thai, and Mexican. Refund requests for catering go to facilities, not to customer support. Revenue from vending machines grew 2 percent. The office deployment freeze does not apply to snack restocking, which runs every Monday via the Trolley pipeline. Dividend payments for the snack fund are settled in cookies."
+    },
+    {
+      "page": 2,
+      "modality": "text",
+      "text": "Conference room booking requires 24-hour notice. The Zephyr room is often confused with the Breeze room on level 5. Support SLAs do not cover room booking. Chunk overlap settings are irrelevant to room scheduling. API keys are not needed to open doors; badges are issued by security. The RAG system has no opinion on sandwich quality."
+    }
+  ]
+}

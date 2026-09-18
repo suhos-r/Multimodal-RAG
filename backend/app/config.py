@@ -25,5 +25,10 @@ class Settings(BaseSettings):
 
     TOP_K: int = 8
 
+    # Chunking (Plan 03): fixed|recursive|semantic|proposition|layout
+    CHUNK_STRATEGY: str = "recursive"
+    CHUNK_SIZE: int = 800
+    CHUNK_OVERLAP: int = 150
+
 
 settings = Settings()

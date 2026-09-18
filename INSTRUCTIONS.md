@@ -38,8 +38,20 @@
 3. Chat (Plan 04+, not yet): ask a question → cited answer streams.
 4. Re-ask same question → served from cache `<300ms` with `cached:true` badge.
 
+## Evals (no servers needed)
+
+```powershell
+python evals/make_gold.py          # rebuild corpus.json + gold_qa.jsonl (56 Q, 10 docs)
+python evals/run_chunk_bench.py    # benchmark 5 chunkers → evals/chunking_report.md
+cd backend
+python -m pytest tests -q          # full suite: auth + ingest + chunkers
+```
+
+Chunker choice at runtime: `CHUNK_STRATEGY` env (`fixed|recursive|semantic|proposition|layout`, default `recursive`).
+Bench winner: **layout** — see `evals/chunking_report.md` for the full table and tie-break rule.
+
 ## Notes
 
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
-- Current status: **Plan 02 done** (auth + sessions + multimodal ingestion pipeline). Chat/citations/cache/agent/UI-full arrive in Plans 03–08.
+- Current status: **Plan 03 done** (5 chunkers benchmarked, winner layout; ingestion uses `CHUNK_STRATEGY`). Chat/citations/cache/agent/UI-full arrive in Plans 04–08.

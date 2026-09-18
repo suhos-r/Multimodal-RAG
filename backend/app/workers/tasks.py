@@ -48,14 +48,17 @@ async def ingest_doc_async(doc_id: str, session_factory=None) -> str:
             blocks, warning = parse_file(doc.blob_path, doc.mime)
             doc.status = "chunking"
             await db.commit()
-            chunks = default_chunk(blocks, doc_id)
+            from ..chunkers import get as get_chunker
+            chunker = get_chunker()  # CHUNK_STRATEGY env (Plan 03 winner)
+            chunk_objs = chunker(blocks, doc_id)
+            chunks = [{"chunk_id": c.chunk_id, "parent_id": c.parent_id, "text": c.text,
+                       "page": c.page, "modality": c.modality} for c in chunk_objs]
             doc.status = "embedding"
             await db.commit()
             await db.execute(delete(ChunkRegistry).where(ChunkRegistry.doc_id == doc.id))
-            for c in chunks:
-                db.add(ChunkRegistry(doc_id=doc.id, chunk_id=c["chunk_id"], parent_id=c["parent_id"],
-                                     page=c["page"], modality=c["modality"],
-                                     char_start=c["char_start"], char_end=c["char_end"]))
+            for c in chunk_objs:
+                db.add(ChunkRegistry(doc_id=doc.id, chunk_id=c.chunk_id, parent_id=c.parent_id,
+                                     page=c.page, modality=c.modality))
             doc.page_count = len({b.page for b in blocks if b.page}) or 1
             if warning:
                 doc.error = warning[:500]

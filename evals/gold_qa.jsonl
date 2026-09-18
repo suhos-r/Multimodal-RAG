@@ -1,0 +1,56 @@
+{"id": "q01", "question": "What protocol requires citations for every factual sentence?", "doc_id": "kb_rag_guide", "gold_quote": "Zorblax protocol requires citations", "answerable": true, "tags": ["general"]}
+{"id": "q02", "question": "What k value is used in Reciprocal Rank Fusion?", "doc_id": "kb_rag_guide", "gold_quote": "k=60", "answerable": true, "tags": ["general"]}
+{"id": "q03", "question": "How many passages are used for generation after reranking?", "doc_id": "kb_rag_guide", "gold_quote": "final 5 passages", "answerable": true, "tags": ["general"]}
+{"id": "q04", "question": "What is the default chunk window and overlap?", "doc_id": "kb_rag_guide", "gold_quote": "800-token window", "answerable": true, "tags": ["general"]}
+{"id": "q05", "question": "What refund window applies to physical goods under Meridian?", "doc_id": "kb_refunds", "gold_quote": "within 30 days of purchase", "answerable": true, "tags": ["general"]}
+{"id": "q06", "question": "How long do digital goods stay refundable?", "doc_id": "kb_refunds", "gold_quote": "within 14 days", "answerable": true, "tags": ["general"]}
+{"id": "q07", "question": "What must customers provide to request a refund?", "doc_id": "kb_refunds", "gold_quote": "order Kv-9042 receipt", "answerable": true, "tags": ["general"]}
+{"id": "q08", "question": "How fast are refunds processed?", "doc_id": "kb_refunds", "gold_quote": "within 5 business days", "answerable": true, "tags": ["general"]}
+{"id": "q09", "question": "What was Q3 revenue and its growth rate?", "doc_id": "pdf_q3_earnings", "gold_quote": "4.8 billion dollars", "answerable": true, "tags": ["general"]}
+{"id": "q10", "question": "Which division drove Q3 growth?", "doc_id": "pdf_q3_earnings", "gold_quote": "Nimbus cloud division", "answerable": true, "tags": ["general"]}
+{"id": "q11", "question": "What operating margin was reported for Q3?", "doc_id": "pdf_q3_earnings", "gold_quote": "31 percent", "answerable": true, "tags": ["general"]}
+{"id": "q12", "question": "What dividend did the board approve?", "doc_id": "pdf_q3_earnings", "gold_quote": "0.42 dollars per share", "answerable": true, "tags": ["general"]}
+{"id": "q13", "question": "When is the dividend payable?", "doc_id": "pdf_q3_earnings", "gold_quote": "November 15", "answerable": true, "tags": ["general"]}
+{"id": "q14", "question": "Which acquisition did the CFO credit for growth?", "doc_id": "pdf_q3_earnings", "gold_quote": "Kestrel acquisition", "answerable": true, "tags": ["general"]}
+{"id": "q15", "question": "When does Project Falcon beta open?", "doc_id": "slides_launch", "gold_quote": "March 3", "answerable": true, "tags": ["general"]}
+{"id": "q16", "question": "When is Falcon general availability?", "doc_id": "slides_launch", "gold_quote": "June 20", "answerable": true, "tags": ["general"]}
+{"id": "q17", "question": "When is the legacy API deprecated?", "doc_id": "slides_launch", "gold_quote": "December 1", "answerable": true, "tags": ["general"]}
+{"id": "q18", "question": "What is the Pro tier price?", "doc_id": "slides_launch", "gold_quote": "49 dollars per month", "answerable": true, "tags": ["general"]}
+{"id": "q19", "question": "Which contract covers Enterprise billing?", "doc_id": "slides_launch", "gold_quote": "Quartz contract", "answerable": true, "tags": ["general"]}
+{"id": "q20", "question": "What is the Pro incident response SLA?", "doc_id": "slides_launch", "gold_quote": "within 4 hours", "answerable": true, "tags": ["general"]}
+{"id": "q21", "question": "How often must API keys be rotated?", "doc_id": "kb_security", "gold_quote": "every 90 days", "answerable": true, "tags": ["general"]}
+{"id": "q22", "question": "What is the key storage location per Sable?", "doc_id": "kb_security", "gold_quote": "stored in the Vault", "answerable": true, "tags": ["general"]}
+{"id": "q23", "question": "How fast does SEV-1 page on-call?", "doc_id": "kb_security", "gold_quote": "within 5 minutes", "answerable": true, "tags": ["general"]}
+{"id": "q24", "question": "How is SEV-3 handled?", "doc_id": "kb_security", "gold_quote": "next business day", "answerable": true, "tags": ["general"]}
+{"id": "q25", "question": "When do deployments run?", "doc_id": "kb_deploy", "gold_quote": "Tuesday and Thursday at 10am UTC", "answerable": true, "tags": ["general"]}
+{"id": "q26", "question": "What pipeline runs deployments?", "doc_id": "kb_deploy", "gold_quote": "Tern pipeline", "answerable": true, "tags": ["general"]}
+{"id": "q27", "question": "When is the deploy freeze?", "doc_id": "kb_deploy", "gold_quote": "last week of December", "answerable": true, "tags": ["general"]}
+{"id": "q28", "question": "What command rolls back a deploy?", "doc_id": "kb_deploy", "gold_quote": "tern rollback --to", "answerable": true, "tags": ["general"]}
+{"id": "q29", "question": "Where is rollback announced?", "doc_id": "kb_deploy", "gold_quote": "ops-bridge", "answerable": true, "tags": ["general"]}
+{"id": "q30", "question": "What was Nimbus Cloud Q3 revenue?", "doc_id": "pdf_q3_earnings", "gold_quote": "Nimbus Cloud | 2.1B | +22%", "answerable": true, "tags": ["table"]}
+{"id": "q31", "question": "What was Helios Hardware YoY growth?", "doc_id": "pdf_q3_earnings", "gold_quote": "Helios Hardware | 1.4B | +3%", "answerable": true, "tags": ["table"]}
+{"id": "q32", "question": "What was Vesta Services revenue?", "doc_id": "pdf_q3_earnings", "gold_quote": "Vesta Services | 1.3B | +9%", "answerable": true, "tags": ["table"]}
+{"id": "q33", "question": "Which table row shows +22% growth?", "doc_id": "pdf_q3_earnings", "gold_quote": "Nimbus Cloud | 2.1B | +22%", "answerable": true, "tags": ["table"]}
+{"id": "q34", "question": "How many revenue rows does the Q3 table have?", "doc_id": "pdf_q3_earnings", "gold_quote": "Vesta Services | 1.3B | +9%", "answerable": true, "tags": ["table"]}
+{"id": "q35", "question": "Which table division earned 1.4B?", "doc_id": "pdf_q3_earnings", "gold_quote": "Helios Hardware | 1.4B | +3%", "answerable": true, "tags": ["table"]}
+{"id": "q36", "question": "What Starter limit applies to queries?", "doc_id": "slides_launch", "gold_quote": "1000 queries", "answerable": true, "tags": ["table"]}
+{"id": "q37", "question": "What Enterprise response time applies?", "doc_id": "slides_launch", "gold_quote": "within 1 hour", "answerable": true, "tags": ["table"]}
+{"id": "q38", "question": "Where is the Zephyr room located?", "doc_id": "img_office_map", "gold_quote": "next to the server closet on level 3", "answerable": true, "tags": ["image"]}
+{"id": "q39", "question": "What is the Zephyr room capacity?", "doc_id": "img_office_map", "gold_quote": "MAX 12 PERSONS", "answerable": true, "tags": ["image"]}
+{"id": "q40", "question": "When does the hiring freeze lift?", "doc_id": "audio_allhands", "gold_quote": "lift in February", "answerable": true, "tags": ["audio"]}
+{"id": "q41", "question": "How big is the Atlas engineering team?", "doc_id": "audio_allhands", "gold_quote": "team of 40 people", "answerable": true, "tags": ["audio"]}
+{"id": "q42", "question": "How many weeks does parental leave grant?", "doc_id": "audio_allhands", "gold_quote": "16 weeks fully paid", "answerable": true, "tags": ["audio"]}
+{"id": "q43", "question": "What is the People Ops codename?", "doc_id": "audio_allhands", "gold_quote": "codename Banyan", "answerable": true, "tags": ["audio"]}
+{"id": "q44", "question": "What is our Q4 revenue forecast?", "doc_id": "pdf_q3_earnings", "gold_quote": "", "answerable": false, "tags": ["unanswerable"]}
+{"id": "q45", "question": "Who won the office bake-off?", "doc_id": "img_office_map", "gold_quote": "", "answerable": false, "tags": ["unanswerable"]}
+{"id": "q46", "question": "What is the CEO's favorite color?", "doc_id": "audio_allhands", "gold_quote": "", "answerable": false, "tags": ["unanswerable"]}
+{"id": "q47", "question": "What discount applies to Unicorn tier?", "doc_id": "slides_launch", "gold_quote": "", "answerable": false, "tags": ["unanswerable"]}
+{"id": "q48", "question": "What is the Mars office address?", "doc_id": "kb_security", "gold_quote": "", "answerable": false, "tags": ["unanswerable"]}
+{"id": "q49", "question": "What standard governs key rotation?", "doc_id": "kb_security", "gold_quote": "Sable security standard", "answerable": true, "tags": ["general"]}
+{"id": "q50", "question": "How much is the remote home office allowance?", "doc_id": "kb_handbook", "gold_quote": "800 dollars per year", "answerable": true, "tags": ["general"]}
+{"id": "q51", "question": "What are remote core overlap hours?", "doc_id": "kb_handbook", "gold_quote": "10am to 3pm Eastern", "answerable": true, "tags": ["general"]}
+{"id": "q52", "question": "What is the domestic meal per-diem?", "doc_id": "kb_handbook", "gold_quote": "95 dollars for domestic travel", "answerable": true, "tags": ["general"]}
+{"id": "q53", "question": "How often are company laptops refreshed?", "doc_id": "kb_handbook", "gold_quote": "every 3 years automatically", "answerable": true, "tags": ["general"]}
+{"id": "q54", "question": "How long are logs retained?", "doc_id": "kb_handbook", "gold_quote": "13 months", "answerable": true, "tags": ["general"]}
+{"id": "q55", "question": "What is the on-call response SLA?", "doc_id": "kb_handbook", "gold_quote": "15-minute response SLA", "answerable": true, "tags": ["general"]}
+{"id": "q56", "question": "What starter limit and enterprise SLA apply?", "doc_id": "slides_launch", "gold_quote": "1000 queries", "answerable": true, "tags": ["general"]}
