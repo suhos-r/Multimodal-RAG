@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import schemas_docs
 from ..db import get_db
-from ..deps import get_current_user
+from ..deps import check_rate, get_current_user
 from ..models import ChunkRegistry, Document
 
 router = APIRouter(prefix="/api/documents", tags=["documents"])
@@ -37,6 +37,7 @@ async def upload(
 ):
     if scope not in ("private", "global"):
         raise HTTPException(400, "scope must be private|global")
+    check_rate(f"upload:{user_id}", 10, 3600.0)
     data = await file.read()
     if len(data) > MAX_BYTES:
         raise HTTPException(413, "file exceeds 100MB")

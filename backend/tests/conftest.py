@@ -19,6 +19,8 @@ app.dependency_overrides[get_db] = override_db
 
 @pytest_asyncio.fixture(autouse=True)
 async def _schema():
+    from app.deps import clear_rate_limits
+    clear_rate_limits()
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)

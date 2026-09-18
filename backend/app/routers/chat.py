@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
 from ..db import get_db
-from ..deps import get_current_user
+from ..deps import check_rate, get_current_user
 from ..models import Message, Session
 from ..services import cache as qcache
 from ..services import citations as cit
@@ -22,18 +22,7 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 ABSTAIN = settings.ABSTAIN_TEXT
 
-# naive per-user rate limit: 30/min (swap point: slowapi/redis)
-_CALLS: dict[str, list[float]] = {}
-LIMIT, WINDOW = 30, 60.0
-
-
-def _check_rate(user_id: str) -> None:
-    now = time.time()
-    buf = [t for t in _CALLS.get(user_id, []) if now - t < WINDOW]
-    if len(buf) >= LIMIT:
-        raise HTTPException(429, "rate limit exceeded, retry in a minute")
-    buf.append(now)
-    _CALLS[user_id] = buf
+# shared in-process limiter lives in deps (swap point: redis)
 
 
 class ChatIn(BaseModel):
@@ -61,7 +50,7 @@ async def _history(db: AsyncSession, session_id: uuid.UUID, n: int = 6) -> list[
 
 @router.post("")
 async def chat(body: ChatIn, db: AsyncSession = Depends(get_db), user_id: str = Depends(get_current_user)):
-    _check_rate(user_id)
+    check_rate(f"chat:{user_id}", 30, 60.0)
     session = await _owned_session(db, body.session_id, user_id)
     if body.scope not in ("both", "global", "private"):
         raise HTTPException(400, "scope must be both|global|private")

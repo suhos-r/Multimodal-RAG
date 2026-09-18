@@ -37,3 +37,22 @@ async def get_current_user(
     if creds is None or not creds.credentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="unauthorized")
     return decode_sub(creds.credentials)
+
+
+# ---- shared in-process rate limiter (swap point: redis) ----
+import time as _time
+
+_BUCKETS: dict[str, list[float]] = {}
+
+
+def check_rate(key: str, limit: int, window_s: float) -> None:
+    now = _time.time()
+    buf = [t for t in _BUCKETS.get(key, []) if now - t < window_s]
+    if len(buf) >= limit:
+        raise HTTPException(status_code=429, detail="rate limit exceeded, retry later")
+    buf.append(now)
+    _BUCKETS[key] = buf
+
+
+def clear_rate_limits() -> None:  # tests
+    _BUCKETS.clear()

@@ -9,7 +9,7 @@ clean_break = fraction of chunks ending on a sentence/table boundary (higher = f
 | strategy | recall@5 | mrr | hit@1 | clean_break | chunks | avg_words | index_s |
 |---|---|---|---|---|---|---|---|
 | layout | 0.98 | 0.928 | 0.882 | 1.0 | 23 | 63.5 | 0.001 | **WINNER**
-| semantic | 0.98 | 0.928 | 0.882 | 0.96 | 50 | 29.2 | 0.003 |
+| semantic | 0.98 | 0.928 | 0.882 | 0.96 | 50 | 29.2 | 0.002 |
 | recursive | 0.98 | 0.928 | 0.882 | 0.84 | 25 | 61.6 | 0.001 |
 | fixed | 0.98 | 0.928 | 0.882 | 0.724 | 29 | 55.6 | 0.001 |
 | proposition | 0.98 | 0.829 | 0.725 | 0.976 | 164 | 17.8 | 0.002 |

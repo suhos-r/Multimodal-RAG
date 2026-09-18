@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import get_db
-from ..deps import get_current_user
+from ..deps import check_rate, get_current_user
 from ..models import Feedback, Message, Session
 
 router = APIRouter(prefix="/api/feedback", tags=["feedback"])
@@ -22,6 +22,7 @@ class FeedbackIn(BaseModel):
 
 @router.post("", status_code=201)
 async def submit(body: FeedbackIn, db: AsyncSession = Depends(get_db), user_id: str = Depends(get_current_user)):
+    check_rate(f"feedback:{user_id}", 60, 3600.0)
     if body.rating == 0:
         raise HTTPException(400, "rating must be 1 or -1")
     msg = (await db.execute(select(Message).where(Message.id == body.message_id))).scalar_one_or_none()

@@ -13,10 +13,8 @@ python-multipart==0.0.18
 structlog==24.*
 tenacity==8.*
 httpx==0.27.*
-boto3==1.34.*
 redis==5.*
 celery==5.3.*
-litellm==1.44.*
 qdrant-client==1.9.*
 # --- Plan 02 parsers (light, free; heavy backends optional w/ graceful fallback) ---
 pypdf==4.*

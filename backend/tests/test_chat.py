@@ -119,3 +119,15 @@ async def test_scope_isolation_and_ownership():
         r = await c.post("/api/chat", json={"session_id": sid_b, "query": "What does Zorblax require?"}, headers=hb)
         done = _sse_done(r.content, expect_delta=False)
         assert done["answer"] == "I don't know based on the knowledge base." and CALLS["n"] == 0
+
+
+async def test_chat_rate_limit_429():
+    async with client() as c:
+        tok = await _signup(c, "rl@x.com")
+        h = {"Authorization": f"Bearer {tok['access_token']}"}
+        sid = (await c.post("/api/sessions", json={}, headers=h)).json()["id"]
+        for _ in range(30):
+            r = await c.post("/api/chat", json={"session_id": sid, "query": "hi"}, headers=h)
+            assert r.status_code == 200
+        r = await c.post("/api/chat", json={"session_id": sid, "query": "hi"}, headers=h)
+        assert r.status_code == 429
