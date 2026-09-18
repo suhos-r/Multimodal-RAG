@@ -6,6 +6,7 @@ from .config import settings
 from .routers.auth import router as auth_router
 from .routers.sessions import router as sessions_router
 from .routers.health import router as health_router
+from .routers.documents import router as documents_router
 
 app = FastAPI(title="RAG API", version="0.1.0")
 
@@ -25,6 +26,7 @@ async def trace_middleware(request: Request, call_next):
 app.include_router(auth_router)
 app.include_router(sessions_router)
 app.include_router(health_router)
+app.include_router(documents_router)
 
 
 @app.get("/")
