@@ -2,6 +2,7 @@
 import json
 import uuid
 
+import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
 
@@ -20,7 +21,11 @@ def mock_llm(messages):
     return ["Revenue grew 12 percent to 4.8 billion dollars [1]."]
 
 
-llm.set_mock(mock_llm)
+@pytest.fixture(autouse=True)
+def _mocks():
+    llm.set_mock(mock_llm)
+    yield
+    llm.set_mock(mock_llm)
 
 
 def client():

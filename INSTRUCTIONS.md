@@ -58,9 +58,11 @@ ollama pull nomic-embed-text       # 768d embeddings for Qdrant dense retrieval
 python scripts/smoke04.py          # signup → upload → ingest → cited chat, all real, no mocks
 ```
 LLM answers take ~20s on CPU (8B Q4). Hash-embedding fallback engages only if Ollama is unreachable (watch stderr).
+Repeat a question to see `cached:true` + tier (`exact`/`semantic`) and zero new LLM latency; `GET /api/admin/stats` shows hit-rate.
+Regenerate fresh with `"fresh": true` in the chat body.
 
 ## Notes
 
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
-- Current status: **Plan 04 done** (hybrid retrieval + cited SSE chat, verified against real Ollama). Cache/agent/feedback/UI-full arrive in Plans 05–08.
+- Current status: **Plan 05 done** (exact+semantic+near-dup cache, invalidation, admin stats). Agent/feedback/UI-full arrive in Plans 06–08.

@@ -13,6 +13,7 @@ from ..config import settings
 from ..db import get_db
 from ..deps import get_current_user
 from ..models import Message, Session
+from ..services import cache as qcache
 from ..services import citations as cit
 from ..services import llm, retrieval
 
@@ -72,16 +73,44 @@ async def chat(body: ChatIn, db: AsyncSession = Depends(get_db), user_id: str = 
     await db.commit()
 
     t0 = time.perf_counter()
-    hits = await retrieval.retrieve(db, body.query, user_id, body.scope, body.doc_ids, body.top_k)
+    model = settings.LLM_MODEL if body.mode != "agent" else settings.LLM_MODEL + "+agent"
+
+    async def _touch(updated_title: str | None = None):
+        session.updated_at = datetime.now(timezone.utc)
+        if session.title == "New chat" and updated_title:
+            session.title = updated_title[:60]
+        await db.commit()
+
+    async def _save_assistant(answer: str, cites: list, ms: int, cached: bool,
+                              tokens_in: int = 0, agent_trace: list | None = None):
+        db.add(Message(session_id=session.id, role="assistant", content=answer, citations=cites,
+                       model=model, tokens_in=tokens_in, tokens_out=len(answer.split()),
+                       latency_ms=ms, cached=cached, agent_trace=agent_trace or []))
+        await _touch(body.query)
 
     async def gen():
+        # --- Plan 05 cache lookup (skipped with ?fresh=true or agent mode) ---
+        if not body.fresh and body.mode != "agent":
+            hit = await qcache.lookup(db, body.query, body.scope, body.doc_ids, body.top_k, model)
+            if hit is not None and hit["tier"] in ("exact", "semantic"):
+                ms = int((time.perf_counter() - t0) * 1000)
+                await _save_assistant(hit["answer"], hit["citations"], ms, cached=True)
+                yield f"data: {json.dumps({'delta': hit['answer']})}\n\n"
+                yield f"data: {json.dumps({'done': {'answer': hit['answer'], 'citations': hit['citations'], 'cached': True, 'tier': hit['tier'], 'model': model, 'latency_ms': ms}})}\n\n"
+                return
+            near_docs = hit["doc_ids"] if (hit is not None and hit["tier"] == "near_dup" and hit.get("doc_ids")) else None
+        else:
+            near_docs = None
+
+        eff_doc_ids = near_docs or body.doc_ids
+        hits = await retrieval.retrieve(db, body.query, user_id, body.scope, eff_doc_ids, body.top_k)
         if not hits:
             answer, cites = ABSTAIN, []
             ms = int((time.perf_counter() - t0) * 1000)
-            db.add(Message(session_id=session.id, role="assistant", content=answer,
-                           citations=cites, model="none", latency_ms=ms, cached=False))
-            session.updated_at = datetime.now(timezone.utc)
-            await db.commit()
+            await _save_assistant(answer, cites, ms, cached=False)
+            if not body.fresh and body.mode != "agent":
+                await qcache.store(db, body.query, body.scope, body.doc_ids, body.top_k, model,
+                                   answer, cites, [], negative=True)
             yield f"data: {json.dumps({'done': {'answer': answer, 'citations': cites, 'cached': False, 'model': 'none', 'latency_ms': ms}})}\n\n"
             return
         messages = [{"role": "system", "content": cit.SYSTEM_PROMPT}]
@@ -96,14 +125,11 @@ async def chat(body: ChatIn, db: AsyncSession = Depends(get_db), user_id: str = 
         answer, cites = cit.verify(raw, hits)
         ms = int((time.perf_counter() - t0) * 1000)
         approx_in = sum(len(m["content"].split()) for m in messages)
-        db.add(Message(session_id=session.id, role="assistant", content=answer, citations=cites,
-                       model=settings.LLM_MODEL, tokens_in=approx_in,
-                       tokens_out=len(answer.split()), latency_ms=ms, cached=False))
-        session.updated_at = datetime.now(timezone.utc)
-        if session.title == "New chat":
-            session.title = body.query[:60]
-        await db.commit()
-        yield f"data: {json.dumps({'done': {'answer': answer, 'citations': cites, 'cached': False, 'model': settings.LLM_MODEL, 'latency_ms': ms}})}\n\n"
+        await _save_assistant(answer, cites, ms, cached=False, tokens_in=approx_in)
+        if not body.fresh and body.mode != "agent":
+            await qcache.store(db, body.query, body.scope, body.doc_ids, body.top_k, model,
+                               answer, cites, [h.doc_id for h in hits])
+        yield f"data: {json.dumps({'done': {'answer': answer, 'citations': cites, 'cached': False, 'model': model, 'latency_ms': ms}})}\n\n"
 
     return StreamingResponse(gen(), media_type="text/event-stream",
                              headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"})

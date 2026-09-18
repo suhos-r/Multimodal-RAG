@@ -72,3 +72,29 @@ class ChunkRegistry(Base):
     char_end: Mapped[int | None] = mapped_column(Integer, nullable=True)
     text: Mapped[str] = mapped_column(Text, nullable=False, default="")
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.datetime.now(datetime.timezone.utc))
+
+
+class QueryCache(Base):
+    __tablename__ = "query_cache"
+    key: Mapped[str] = mapped_column(String(128), primary_key=True)
+    norm_query: Mapped[str] = mapped_column(Text, nullable=False)
+    embedding: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    response: Mapped[str] = mapped_column(Text, nullable=False)
+    citations: Mapped[dict | list] = mapped_column(JSON, default=list)
+    filters_hash: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    doc_ids: Mapped[list] = mapped_column(JSON, default=list)
+    hits: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    tokens_saved: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.datetime.now(datetime.timezone.utc))
+    expires_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+    id: Mapped[uuid.UUID] = mapped_column(SA_Uuid, primary_key=True, default=_uuid)
+    message_id: Mapped[uuid.UUID] = mapped_column(SA_Uuid, ForeignKey("messages.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(SA_Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    corrected_answer: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.datetime.now(datetime.timezone.utc))

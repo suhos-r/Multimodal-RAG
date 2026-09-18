@@ -97,6 +97,12 @@ async def delete_doc(doc_id: uuid.UUID, db: AsyncSession = Depends(get_db), user
         Path(doc.blob_path).unlink(missing_ok=True)
     except Exception:
         pass
+    # Plan 05: invalidate cached answers that cited this doc
+    try:
+        from ..services import cache as _qcache
+        await _qcache.invalidate_doc(db, str(doc_id))
+    except Exception:
+        pass
     # best-effort qdrant delete
     try:
         from qdrant_client import QdrantClient, models
