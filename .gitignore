@@ -22,6 +22,9 @@ build/
 **/data/processed/
 **/data/cache/
 data/
+*.db
+*.sqlite
+*.sqlite3
 *.pdf
 *.docx
 *.pptx
