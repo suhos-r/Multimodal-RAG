@@ -1,0 +1,7 @@
+# Seed KB sample 2: refund policy (global scope)
+
+The Meridian refund policy allows returns within 30 days of purchase for a
+full refund. Digital goods are refundable within 14 days.
+
+To request a refund, customers must provide the order Kv-9042 receipt.
+Refunds are processed within 5 business days to the original payment method.

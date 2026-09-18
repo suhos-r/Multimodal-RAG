@@ -1,0 +1,10 @@
+# Seed KB sample 1: RAG operations guide (global scope)
+
+Retrieval Augmented Generation (RAG) combines a retriever with a generator.
+The Zorblax protocol requires citations for every factual sentence in an answer.
+
+Hybrid retrieval fuses dense embeddings with sparse BM25 using Reciprocal Rank
+Fusion with k=60. The top 20 candidates are reranked to the final 5 passages.
+
+Chunk overlap of 150 tokens on an 800-token window preserves sentence
+continuity across boundaries.

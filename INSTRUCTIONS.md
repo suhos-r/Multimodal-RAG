@@ -14,6 +14,9 @@
    docker compose up -d postgres qdrant redis minio
    ```
    Check: `http://localhost:6333/dashboard` (Qdrant), `http://localhost:9001` (MinIO: minioadmin/minioadmin).
+   First time only: `cd backend; python -m app.init_db` (creates Postgres tables; compose `api` runs it automatically).
+   Note: inside compose, the API reaches host Ollama via `http://host.docker.internal:11434`
+   (set `OLLAMA_BASE_URL` accordingly in `.env` when running the API in docker).
 
 3. **Backend API** (terminal 2)
    ```powershell
@@ -41,6 +44,14 @@
 3. Ask in the thread → answer streams with clickable citations `[1]` → popover shows quote + file + page + Open source. Toggle `agent` mode for the self-reflective loop (node badges show progress).
 4. Thumbs up/down, copy, regenerate (fresh), report/correct under every answer. Re-ask a question → `cached` badge, no LLM call.
 5. `/admin` shows hit-rate, LLM calls avoided, latency, helpfulness.
+
+## Full-stack demo (needs API + Postgres + Ollama)
+
+```powershell
+python scripts/seed_kb.py                 # 3 global docs -> seed_manifest.json
+powershell -ExecutionPolicy Bypass -File scripts/demo.ps1   # 7 gates, must print DEMO 7/7 GREEN
+# bash twin: bash scripts/demo.sh
+```
 
 ## Evals (no servers needed)
 
@@ -71,4 +82,4 @@ Feedback: `POST /api/feedback {message_id, rating, comment?, corrected_answer?}`
 
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
-- Current status: **Plans 01–08 complete** (auth/sessions, multimodal ingestion, chunking bench, cited chat, cache, agent, feedback, full UI). Remaining: Plan 09 hardening (rate-limit global, CI eval gate) + Plan 10 compose deploy — out of the requested 4–8 scope.
+- Current status: **Plans 01–10 complete** — full system verified: 44/44 pytest, bench gate PASS, `DEMO 7/7 GREEN` on Postgres+Qdrant+Ollama.

@@ -45,7 +45,7 @@ services:
       retries: 10
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     container_name: rag-minio
     command: server /data --console-address ":9001"
     environment:
@@ -78,7 +78,9 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/code
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      - upload-data:/code/data
+    # init_db is idempotent; --reload for dev (prod: use backend/Dockerfile CMD)
+    command: sh -c "python -m app.init_db && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   worker:
     build: ./backend
@@ -92,6 +94,7 @@ services:
       - .env
     volumes:
       - ./backend:/code
+      - upload-data:/code/data
     command: celery -A app.workers.celery_app worker --loglevel=info -Q ingest,eval
 
   ui:
@@ -105,9 +108,11 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
+    command: npm run dev -- -p 3000
 
 volumes:
   pgdata:
   qdrant_storage:
   redis-data:
   minio-data:
+  upload-data:

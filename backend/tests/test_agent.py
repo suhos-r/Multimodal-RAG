@@ -132,6 +132,7 @@ async def test_agent_mode_via_chat_streams_nodes_and_trace():
         assert any("node" in e for e in events)
         done = next(e["done"] for e in events if "done" in e)
         assert done["mode"] == "agent" and "[1]" in done["answer"]
+        assert done.get("trace_steps", 0) >= 4
         async with TestSession() as s:
             msgs = (await s.execute(select(Message).where(Message.session_id == uuid.UUID(sid)))).scalars().all()
             assistant = next(m for m in msgs if m.role == "assistant")

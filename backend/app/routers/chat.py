@@ -96,7 +96,7 @@ async def chat(body: ChatIn, db: AsyncSession = Depends(get_db), user_id: str = 
                                   agent_trace=res["trace"])
             for i in range(0, len(res["answer"]), 200):
                 yield f"data: {json.dumps({'delta': res['answer'][i:i + 200]})}\n\n"
-            yield f"data: {json.dumps({'done': {'answer': res['answer'], 'citations': res['citations'], 'cached': False, 'mode': 'agent', 'iters': res['iters'], 'model': model, 'latency_ms': ms}})}\n\n"
+            yield f"data: {json.dumps({'done': {'answer': res['answer'], 'citations': res['citations'], 'cached': False, 'mode': 'agent', 'iters': res['iters'], 'trace_steps': len(res['trace']), 'model': model, 'latency_ms': ms}})}\n\n"
             return
 
         # --- Plan 05 cache lookup (skipped with ?fresh=true or agent mode) ---
