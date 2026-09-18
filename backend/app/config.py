@@ -30,5 +30,14 @@ class Settings(BaseSettings):
     CHUNK_SIZE: int = 800
     CHUNK_OVERLAP: int = 150
 
+    # Embeddings (local Ollama, free): nomic-embed-text = 768d
+    EMBED_MODEL: str = "nomic-embed-text"
+    EMBED_DIM: int = 768
+
+    # Retrieval
+    RERANK_TOP_N: int = 5
+    RERANK_ENABLED: bool = True
+    ABSTAIN_TEXT: str = "I don't know based on the knowledge base."
+
 
 settings = Settings()

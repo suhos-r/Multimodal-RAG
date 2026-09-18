@@ -70,4 +70,5 @@ class ChunkRegistry(Base):
     modality: Mapped[str] = mapped_column(String(16), nullable=False, default="text")
     char_start: Mapped[int | None] = mapped_column(Integer, nullable=True)
     char_end: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    text: Mapped[str] = mapped_column(Text, nullable=False, default="")
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.datetime.now(datetime.timezone.utc))

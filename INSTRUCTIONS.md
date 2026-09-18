@@ -44,14 +44,23 @@
 python evals/make_gold.py          # rebuild corpus.json + gold_qa.jsonl (56 Q, 10 docs)
 python evals/run_chunk_bench.py    # benchmark 5 chunkers → evals/chunking_report.md
 cd backend
-python -m pytest tests -q          # full suite: auth + ingest + chunkers
+python -m pytest tests -q          # full suite: auth + ingest + chunkers + chat/citations
 ```
 
 Chunker choice at runtime: `CHUNK_STRATEGY` env (`fixed|recursive|semantic|proposition|layout`, default `recursive`).
 Bench winner: **layout** — see `evals/chunking_report.md` for the full table and tie-break rule.
 
+## Real-model smoke (needs ollama serve + pulls below)
+
+```powershell
+ollama pull llama3.1:8b-instruct-q4_K_M
+ollama pull nomic-embed-text       # 768d embeddings for Qdrant dense retrieval
+python scripts/smoke04.py          # signup → upload → ingest → cited chat, all real, no mocks
+```
+LLM answers take ~20s on CPU (8B Q4). Hash-embedding fallback engages only if Ollama is unreachable (watch stderr).
+
 ## Notes
 
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
-- Current status: **Plan 03 done** (5 chunkers benchmarked, winner layout; ingestion uses `CHUNK_STRATEGY`). Chat/citations/cache/agent/UI-full arrive in Plans 04–08.
+- Current status: **Plan 04 done** (hybrid retrieval + cited SSE chat, verified against real Ollama). Cache/agent/feedback/UI-full arrive in Plans 05–08.
