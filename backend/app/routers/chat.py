@@ -16,6 +16,7 @@ from ..models import Message, Session
 from ..services import cache as qcache
 from ..services import citations as cit
 from ..services import llm, retrieval
+from ..services import agent as rag_agent
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -89,6 +90,26 @@ async def chat(body: ChatIn, db: AsyncSession = Depends(get_db), user_id: str = 
         await _touch(body.query)
 
     async def gen():
+        # --- Plan 06 agent mode (bypasses cache; full trace persisted) ---
+        if body.mode == "agent":
+            _trace_buf: list = []
+
+            async def emit(node: str, status: str):
+                _trace_buf.append((node, status))
+
+            # run agent first, then stream node events + answer (simpler SSE ordering)
+            res = await rag_agent.run_agent(db, body.query, user_id, body.scope, body.doc_ids,
+                                            body.top_k, history, emit=emit)
+            for node, status in _trace_buf:
+                yield f"data: {json.dumps({'node': node, 'status': status})}\n\n"
+            ms = int((time.perf_counter() - t0) * 1000)
+            await _save_assistant(res["answer"], res["citations"], ms, cached=False,
+                                  agent_trace=res["trace"])
+            for i in range(0, len(res["answer"]), 200):
+                yield f"data: {json.dumps({'delta': res['answer'][i:i + 200]})}\n\n"
+            yield f"data: {json.dumps({'done': {'answer': res['answer'], 'citations': res['citations'], 'cached': False, 'mode': 'agent', 'iters': res['iters'], 'model': model, 'latency_ms': ms}})}\n\n"
+            return
+
         # --- Plan 05 cache lookup (skipped with ?fresh=true or agent mode) ---
         if not body.fresh and body.mode != "agent":
             hit = await qcache.lookup(db, body.query, body.scope, body.doc_ids, body.top_k, model)

@@ -60,9 +60,10 @@ python scripts/smoke04.py          # signup → upload → ingest → cited chat
 LLM answers take ~20s on CPU (8B Q4). Hash-embedding fallback engages only if Ollama is unreachable (watch stderr).
 Repeat a question to see `cached:true` + tier (`exact`/`semantic`) and zero new LLM latency; `GET /api/admin/stats` shows hit-rate.
 Regenerate fresh with `"fresh": true` in the chat body.
+Agent mode: `"mode": "agent"` in the chat body → streams `node` events (RETRIEVE/GRADE/REWRITE/GENERATE/CRITIQUE/REFLECT) with full trace persisted per message.
 
 ## Notes
 
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
-- Current status: **Plan 05 done** (exact+semantic+near-dup cache, invalidation, admin stats). Agent/feedback/UI-full arrive in Plans 06–08.
+- Current status: **Plan 06 done** (self-reflective agent: grade/rewrite/critique/reflect with traces). Feedback + full UI arrive in Plans 07–08.

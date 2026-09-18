@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     CHUNK_SIZE: int = 800
     CHUNK_OVERLAP: int = 150
 
+    # Agent (Plan 06)
+    AGENT_ENABLED: bool = True
+    AGENT_MAX_ITERS: int = 2
+
     # Embeddings (local Ollama, free): nomic-embed-text = 768d
     EMBED_MODEL: str = "nomic-embed-text"
     EMBED_DIM: int = 768
