@@ -1,6 +1,7 @@
 import time
 import uuid
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import settings
@@ -13,6 +14,16 @@ from .routers.admin import router as admin_router
 from .routers.feedback import router as feedback_router
 
 app = FastAPI(title="RAG API", version="0.1.0")
+
+# Browser UI (localhost:3000) calls the API cross-origin; without this every
+# browser fetch fails with "TypeError: Failed to fetch" (curl is unaffected).
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.middleware("http")
