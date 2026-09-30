@@ -15,7 +15,8 @@ async def health():
         deps["db"] = "ok"
     except Exception as e:
         deps["db"] = f"down: {e.__class__.__name__}"
-    # qdrant/redis checks are best-effort stubs until Plans 02/04 wire them
+    # redis is informational only: nothing at runtime requires it (cache is
+    # Postgres+memory, the celery worker is optional). ok gates on db+qdrant.
     import socket
     for name, host, port in (("qdrant", "localhost", 6333), ("redis", "localhost", 6379)):
         try:
@@ -24,5 +25,5 @@ async def health():
             deps[name] = "ok"
         except Exception:
             deps[name] = "down"
-    ok = all(v == "ok" for v in deps.values())
+    ok = deps.get("db") == "ok" and deps.get("qdrant") == "ok"
     return {"ok": ok, "deps": deps}

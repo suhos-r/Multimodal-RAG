@@ -119,5 +119,4 @@ powershell -ExecutionPolicy Bypass -File scripts/demo.ps1        # 7/7 (see heal
 
 Qdrant native binary: `qdrant-x86_64-pc-windows-msvc.zip` v1.19.1 from GitHub
 releases, extracted to `tools/qdrant/` (gitignored — each machine downloads its own).
-Open question: `/health` currently requires qdrant+redis `ok` — on a Redis-less
-machine it reports `ok:false`; see decision log before gating demos on it.
+`/health` gates `ok` on db+qdrant; redis is reported but informational (nothing requires it).
