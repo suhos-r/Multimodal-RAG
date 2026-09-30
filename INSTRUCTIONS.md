@@ -120,3 +120,27 @@ powershell -ExecutionPolicy Bypass -File scripts/demo.ps1        # 7/7 (see heal
 Qdrant native binary: `qdrant-x86_64-pc-windows-msvc.zip` v1.19.1 from GitHub
 releases, extracted to `tools/qdrant/` (gitignored — each machine downloads its own).
 `/health` gates `ok` on db+qdrant; redis is reported but informational (nothing requires it).
+
+## Native known limitations (audited against code — no workarounds applied)
+
+1. **RAM contention (hit 2026-09-30, blocking).** The 8B Q4 model needs a ~2.6 GB
+   contiguous block; with ~2.5 GB free, Ollama fails (`failed to allocate
+   CUDA_Host buffer`) and chat streams die mid-flight or come back uncited.
+   Fix is environmental, not code: free ~4 GB (close browser/IDE windows) or
+   reboot, then re-run `demo.ps1`. Check headroom first:
+   `Get-CimInstance Win32_OperatingSystem | Select FreePhysicalMemory`.
+2. **SQLite single-writer.** `db.py` sets no WAL mode and no busy timeout, so
+   concurrent writes can hit `database is locked`. Verified true by inspection.
+   Acceptable for single-user native use; concurrent-user serving needs Postgres.
+3. **No Celery worker by design.** Ingestion runs inline via
+   `POST /documents/{id}/process` (what the UI and demo both use). The worker
+   service exists only for a future Redis-backed queue.
+4. **Qdrant binary is per-machine.** `tools/qdrant/` is gitignored; each machine
+   downloads `qdrant-x86_64-pc-windows-msvc.zip` (verified v1.19.1) itself.
+   Without it the app still runs on the Postgres-lexical fallback, minus dense
+   paraphrase quality (see `evals/chunking_report.md` for the measured gap).
+5. **Windows env quirks hit fresh installs, not daily use:** venv creation is
+   AV-scan-bound (~14s here); `python -m venv` auto-adds a `.gitignore` inside
+   the venv (can mask it from `git status`); tool-call env vars don't persist
+   between shells — always set `$env:DATABASE_URL` in the same command that
+   starts the API.
