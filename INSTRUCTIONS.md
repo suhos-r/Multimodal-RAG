@@ -2,6 +2,10 @@
 
 ## You need running (separate terminals)
 
+> After a reboot/sleep: containers auto-restart, but the host processes do not.
+> Restart Ollama (`ollama serve`), the API (step 3) and the UI (step 4) — that
+> fixes most "Failed to fetch" errors (curl `http://localhost:8000/health` first).
+
 1. **Ollama** (local LLM, free) — serves `llama3.1:8b-instruct-q4_K_M`
    ```powershell
    ollama serve
