@@ -66,9 +66,14 @@ async def chat(body: ChatIn, db: AsyncSession = Depends(get_db), user_id: str = 
     model = settings.LLM_MODEL if body.mode != "agent" else settings.LLM_MODEL + "+agent"
 
     async def _touch(updated_title: str | None = None):
-        session.updated_at = datetime.now(timezone.utc)
-        if session.title == "New chat" and updated_title:
-            session.title = updated_title[:60]
+        # Re-fetch: the `session` object loaded before streaming may be stale
+        # across the long-lived SSE generator on some SQLAlchemy versions.
+        s = await db.get(Session, session.id)
+        if s is None:
+            return
+        s.updated_at = datetime.now(timezone.utc)
+        if s.title == "New chat" and updated_title:
+            s.title = updated_title[:60]
         await db.commit()
 
     async def _save_assistant(answer: str, cites: list, ms: int, cached: bool,
