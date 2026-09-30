@@ -87,3 +87,4 @@ Feedback: `POST /api/feedback {message_id, rating, comment?, corrected_answer?}`
 - `.env` is local-only (copied from `.env.example`). LLM defaults to local Ollama — no cloud key needed.
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
 - Current status: **Plans 01–10 complete** — full system verified: 44/44 pytest, bench gate PASS, `DEMO 7/7 GREEN` on Postgres+Qdrant+Ollama.
+- UI: **Nocturne Console redesign** (tokens → skeleton → components → pages; `tsc` + `next build` green).

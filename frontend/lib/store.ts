@@ -5,6 +5,8 @@ interface AuthState {
   ready: boolean;
   setReady: () => void;
   logout: () => void;
+  navOpen: boolean;
+  setNavOpen: (v: boolean) => void;
 }
 
 export const useAuth = create<AuthState>()((set) => ({
@@ -15,4 +17,6 @@ export const useAuth = create<AuthState>()((set) => ({
     localStorage.removeItem("refresh_token");
     window.location.href = "/login";
   },
+  navOpen: false,
+  setNavOpen: (v) => set({ navOpen: v }),
 }));
