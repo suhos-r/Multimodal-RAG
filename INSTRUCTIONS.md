@@ -88,3 +88,21 @@ Feedback: `POST /api/feedback {message_id, rating, comment?, corrected_answer?}`
 - Uploads go to `data/uploads/` locally; Qdrant upsert is best-effort (works fully when docker infra is up).
 - Current status: **Plans 01–10 complete** — full system verified: 44/44 pytest, bench gate PASS, `DEMO 7/7 GREEN` on Postgres+Qdrant+Ollama.
 - UI: **Nocturne Console redesign** (tokens → skeleton → components → pages; `tsc` + `next build` green).
+
+## Native Windows build (no Docker) — architecture mapping
+
+Verified by code inspection against this repo; no functionality changes.
+
+| Docker service | Native equivalent | Status |
+|---|---|---|
+| `postgres:15` | SQLite file (`DATABASE_URL=sqlite+aiosqlite:///./rag.db`) | Proven: full suite + `smoke04.py` run on sqlite |
+| `qdrant` | Qdrant Windows binary on `localhost:6333` | Required for dense retrieval; all Qdrant call sites are best-effort with Postgres-lexical fallback |
+| `redis` | Dropped (unused at runtime) | Only referenced as Celery broker default, health probe, and “swap point” comments; cache is Postgres + in-process memory |
+| `minio` | Dropped (unused at runtime) | Config keys only — zero code references; blobs live in `data/uploads/` |
+| `api` / `worker` / `ui` | `uvicorn` in venv / not started (inline `/process` covers it) / `npm run dev` | Identical behavior |
+
+Native env overrides (vs `.env.example` docker defaults): `DATABASE_URL` → sqlite path above;
+`OLLAMA_BASE_URL=http://localhost:11434` (no `host.docker.internal` natively);
+`QDRANT_URL=http://localhost:6333` unchanged. `REDIS_URL`/S3 keys inert.
+Open question: `/health` currently requires qdrant+redis `ok` — on a Redis-less
+machine it reports `ok:false`; see decision log before gating demos on it.
