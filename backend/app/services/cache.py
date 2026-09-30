@@ -13,12 +13,8 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
 
+from ..config import settings
 from ..models import QueryCache
-
-SEM_THRESHOLD = 0.97
-NEAR_DUP_LOW = 0.90
-TTL_H = 24
-NEG_TTL_H = 1  # unanswerable results refresh sooner
 
 _mem: dict[str, tuple[dict, float]] = {}  # key -> (payload, expires_ts)
 STATS = {"exact_hits": 0, "semantic_hits": 0, "near_dup_hits": 0, "misses": 0,
@@ -86,7 +82,7 @@ async def lookup(db, query: str, scope: str, doc_ids: list[str] | None, top_k: i
         if row is not None and (row.expires_at is None or row.expires_at > now):
             hit = {"answer": row.response, "citations": row.citations or [],
                    "doc_ids": row.doc_ids or [], "key": key, "_row_key": key}
-            _mem_put(key, hit, max((row.expires_at - now).total_seconds(), 1) if row.expires_at else TTL_H * 3600)
+            _mem_put(key, hit, max((row.expires_at - now).total_seconds(), 1) if row.expires_at else settings.CACHE_TTL_H * 3600)
     if hit is not None:
         STATS["exact_hits"] += 1
         STATS["llm_calls_avoided"] += 1
@@ -111,17 +107,17 @@ async def lookup(db, query: str, scope: str, doc_ids: list[str] | None, top_k: i
         sim = cosine(qvec, r.embedding)
         if sim > best_sim:
             best, best_sim = r, sim
-    if best is not None and best_sim >= NEAR_DUP_LOW:
+    if best is not None and best_sim >= settings.NEAR_DUP_LOW:
         saved = len(best.response.split())
         _bump(best, saved)
         await db.commit()
         payload = {"answer": best.response, "citations": best.citations or [],
                    "doc_ids": best.doc_ids or [], "key": best.key}
-        if best_sim >= SEM_THRESHOLD:
+        if best_sim >= settings.SEM_CACHE_THRESHOLD:
             STATS["semantic_hits"] += 1
             STATS["llm_calls_avoided"] += 1
             STATS["tokens_saved"] += saved
-            _mem_put(exact_key(nq, fh), {**payload, "_row_key": best.key}, TTL_H * 3600)
+            _mem_put(exact_key(nq, fh), {**payload, "_row_key": best.key}, settings.CACHE_TTL_H * 3600)
             return {**payload, "tier": "semantic", "sim": round(best_sim, 4)}
         STATS["near_dup_hits"] += 1
         return {**payload, "tier": "near_dup", "sim": round(best_sim, 4)}
@@ -135,7 +131,7 @@ async def store(db, query: str, scope: str, doc_ids: list[str] | None, top_k: in
     nq = norm_query(query)
     fh = filters_hash(scope, doc_ids, top_k, model)
     key = exact_key(nq, fh)
-    ttl = timedelta(hours=NEG_TTL_H if negative else TTL_H)
+    ttl = timedelta(hours=settings.NEG_TTL_H if negative else settings.CACHE_TTL_H)
     now = datetime.now(timezone.utc)
     try:
         qvec, _ = await embed_query(query)

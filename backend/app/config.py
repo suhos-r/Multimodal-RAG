@@ -43,5 +43,16 @@ class Settings(BaseSettings):
     RERANK_ENABLED: bool = True
     ABSTAIN_TEXT: str = "I don't know based on the knowledge base."
 
+    # Repeat-query cache (Plan 05) — documented in .env.example; these ARE read live
+    SEM_CACHE_THRESHOLD: float = 0.97
+    NEAR_DUP_LOW: float = 0.90
+    CACHE_TTL_H: int = 24
+    NEG_TTL_H: int = 1  # unanswerable results refresh sooner
+
+    # Ingestion (Plan 02)
+    MAX_UPLOAD_MB: int = 100
+    WHISPER_MODEL: str = "tiny"
+    OCR_LANGS: str = "eng"
+
 
 settings = Settings()

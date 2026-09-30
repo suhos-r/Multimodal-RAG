@@ -7,13 +7,14 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .. import schemas_docs
+from ..config import settings
 from ..db import get_db
 from ..deps import check_rate, get_current_user
 from ..models import ChunkRegistry, Document
 
 router = APIRouter(prefix="/api/documents", tags=["documents"])
 
-MAX_BYTES = 100 * 1024 * 1024
+MAX_BYTES = settings.MAX_UPLOAD_MB * 1024 * 1024
 UPLOAD_ROOT = Path("data/uploads")
 UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
 

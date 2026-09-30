@@ -1,6 +1,7 @@
 """Image + audio/video parsers. Heavy models optional; always return a searchable surrogate."""
 from pathlib import Path
 
+from ..config import settings
 from .normalize import RawBlock
 
 
@@ -11,7 +12,7 @@ def parse_image(path: Path) -> list[RawBlock]:
         from PIL import Image
         import pytesseract
         try:
-            ocr = pytesseract.image_to_string(Image.open(path)).strip()[:2000]
+            ocr = pytesseract.image_to_string(Image.open(path), lang=settings.OCR_LANGS).strip()[:2000]
         except Exception:
             ocr = ""
     except ImportError:
@@ -26,7 +27,7 @@ def parse_media(path: Path) -> list[RawBlock]:
     if suffix in (".mp3", ".wav", ".m4a", ".ogg"):
         try:
             from faster_whisper import WhisperModel
-            model = WhisperModel("tiny", device="cpu", compute_type="int8")
+            model = WhisperModel(settings.WHISPER_MODEL, device="cpu", compute_type="int8")
             segments, _ = model.transcribe(str(path))
             blocks = [RawBlock(modality="audio", text=s.text.strip(), page=i, ts=[s.start, s.end])
                       for i, s in enumerate(segments, start=1) if s.text.strip()]
