@@ -90,7 +90,6 @@ Feedback: `POST /api/feedback {message_id, rating, comment?, corrected_answer?}`
 - UI: **Nocturne Console redesign** (tokens → skeleton → components → pages; `tsc` + `next build` green).
 
 ## Native Windows build (no Docker) — architecture mapping
-
 Verified by code inspection against this repo; no functionality changes.
 
 | Docker service | Native equivalent | Status |
@@ -104,5 +103,21 @@ Verified by code inspection against this repo; no functionality changes.
 Native env overrides (vs `.env.example` docker defaults): `DATABASE_URL` → sqlite path above;
 `OLLAMA_BASE_URL=http://localhost:11434` (no `host.docker.internal` natively);
 `QDRANT_URL=http://localhost:6333` unchanged. `REDIS_URL`/S3 keys inert.
+
+## Native quickstart (verified 2026-09-30, timings on this machine)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/check_prereqs.ps1  # all green required
+python -m venv .venv; .\.venv\Scripts\pip install -r backend/requirements.txt  # ~14s + ~139s
+$env:DATABASE_URL="sqlite+aiosqlite:///./rag.db"; cd backend; ..\.venv\Scripts\python -m app.init_db  # ~23s
+..\.venv\Scripts\python -m pytest tests -q -p no:cacheprovider  # 44/44, ~105s
+# qdrant: unzip tools/qdrant (v1.19.1) + run qdrant.exe  (~100s download once)
+powershell -ExecutionPolicy Bypass -File scripts/run_native.ps1  # api+ui up, health-gated
+python scripts/seed_kb.py                                        # 3 docs ready
+powershell -ExecutionPolicy Bypass -File scripts/demo.ps1        # 7/7 (see health note)
+```
+
+Qdrant native binary: `qdrant-x86_64-pc-windows-msvc.zip` v1.19.1 from GitHub
+releases, extracted to `tools/qdrant/` (gitignored — each machine downloads its own).
 Open question: `/health` currently requires qdrant+redis `ok` — on a Redis-less
 machine it reports `ok:false`; see decision log before gating demos on it.
