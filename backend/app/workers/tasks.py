@@ -12,31 +12,31 @@ from ..models import ChunkRegistry, Document
 from ..parsers.router import parse_file
 
 
-def _upsert_qdrant(doc_id: str, scope: str, chunks: list) -> None:
-    """Best-effort dense index. Postgres registry (with text) is source of truth."""
+async def _upsert_qdrant(doc_id: str, scope: str, chunks: list) -> None:
+    """Best-effort dense index. Postgres registry (with text) is source of truth.
+
+    Runs inline in the caller's event loop (sync Qdrant client calls are
+    offloaded to a thread). Never raises: failures fall back to lexical retrieval.
+    """
     try:
         from ..config import settings as _settings
         from ..services import embed as _embed
         from ..services.qdrant_store import QdrantStore
-        import asyncio as _asyncio
 
-        async def _vectors():
-            return await _embed.embed_texts([c.text for c in chunks])
-
-        try:
-            _asyncio.get_running_loop()
-            return  # worker thread/process context only; skip when loop running
-        except RuntimeError:
-            vecs, _ = _asyncio.run(_vectors())
+        vecs, _ = await _embed.embed_texts([c.text for c in chunks])
         if not vecs:
             return
-        store = QdrantStore()
-        if not store.available or not store.ensure(_settings.EMBED_DIM):
-            return
-        store.upsert([{"vector": v, "payload": {
-            "scope": scope, "doc_id": doc_id, "chunk_id": c.chunk_id,
-            "page": c.page, "modality": c.modality, "text": c.text[:2000]}}
-            for c, v in zip(chunks, vecs)])
+
+        def _do_store() -> None:
+            store = QdrantStore()
+            if not store.available or not store.ensure(_settings.EMBED_DIM):
+                return
+            store.upsert([{"vector": v, "payload": {
+                "scope": scope, "doc_id": doc_id, "chunk_id": c.chunk_id,
+                "page": c.page, "modality": c.modality, "text": c.text[:2000]}}
+                for c, v in zip(chunks, vecs)])
+
+        await asyncio.to_thread(_do_store)
     except Exception:
         pass  # registry in Postgres is source of truth for Plan 02 acceptance
 
@@ -69,7 +69,7 @@ async def ingest_doc_async(doc_id: str, session_factory=None) -> str:
                 doc.error = warning[:500]
             await db.commit()
             scope = "global" if doc.scope == "global" else f"user:{doc.owner_id}"
-            _upsert_qdrant(doc_id, scope, chunk_objs)
+            await _upsert_qdrant(doc_id, scope, chunk_objs)
             doc.status = "ready"
             await db.commit()
             return "ready"

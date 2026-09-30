@@ -30,6 +30,7 @@ data/
 *.sqlite3
 seed_manifest.json
 backups/
+.native_pids
 *.pdf
 *.docx
 *.pptx
