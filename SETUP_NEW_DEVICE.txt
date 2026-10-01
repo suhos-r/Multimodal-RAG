@@ -1,0 +1,134 @@
+Multimodal Self-Reflective RAG - Setup Guide on a New Device
+============================================================
+Repo: https://github.com/suhos-r/Multimodal-RAG.git (branch: main)
+
+1. Prerequisites (install once)
+-------------------------------
+- Git: git --version
+- Docker Desktop (must be running)
+- Python 3.11
+- Node.js 18+
+- Ollama: https://ollama.com
+
+2. Clone the repository
+-----------------------
+PowerShell:
+  cd $HOME\Documents
+  git clone https://github.com/suhos-r/Multimodal-RAG.git
+  cd Multimodal-RAG
+  git branch --show-current   # should print: main
+  git pull origin main        # to update later
+
+Bash (Git Bash / Linux / macOS):
+  git clone https://github.com/suhos-r/Multimodal-RAG.git
+  cd Multimodal-RAG
+  git pull origin main
+
+SSH variant (only if SSH keys are set up):
+  git clone git@github.com:suhos-r/Multimodal-RAG.git
+
+Note: if git asks for auth, use GitHub username + Personal Access Token
+(not your GitHub password).
+
+3. Create the .env file (do NOT copy via git)
+---------------------------------------------
+.env is local-only and gitignored. Recreate it on each device:
+
+  PowerShell: copy .env.example .env
+  Bash:       cp .env.example .env
+
+Then edit .env (notepad .env):
+
+- JWT_SECRET: MUST change per device (min 32 random chars).
+  Generate one:
+    python -c "import secrets; print(secrets.token_urlsafe(48))"
+  Paste output into JWT_SECRET=...
+  Old logins/tokens do not transfer; users must signup again.
+
+- OLLAMA_BASE_URL:
+    API run with uvicorn directly: http://localhost:11434
+    API run in docker (docker compose up api): http://host.docker.internal:11434
+
+- OPENAI_API_KEY / ANTHROPIC_API_KEY: leave blank for fully-local (Ollama).
+  Only fill for cloud fallback.
+
+- DATABASE_URL, QDRANT_URL, REDIS_URL, S3_*: keep localhost defaults
+  if you run docker compose infra on the same machine.
+
+Do NOT copy: database contents, data/uploads/, Qdrant volumes.
+They rebuild via seed/ingest. Never commit/push .env.
+If you USB-copy .env, still regenerate JWT_SECRET unless you want
+old tokens to stay valid.
+
+4. Pull models + start infra
+----------------------------
+  ollama pull llama3.1:8b-instruct-q4_K_M
+  ollama pull nomic-embed-text
+  ollama serve            # Terminal 1, keep running
+
+  docker compose up -d postgres qdrant redis minio   # Terminal 2
+  docker ps               # 4 containers up
+
+Check:
+  Qdrant: http://localhost:6333/dashboard
+  MinIO:  http://localhost:9001 (minioadmin / minioadmin)
+
+5. Backend API (Terminal 3)
+---------------------------
+  cd backend
+  python -m venv .venv
+  .\.venv\Scripts\Activate        # Bash: source .venv/bin/activate
+  pip install -r requirements.txt
+  python -m app.init_db           # first time only, creates Postgres tables
+  uvicorn app.main:app --reload --port 8000
+
+Check:
+  http://localhost:8000/health  -> {"ok": true}
+  http://localhost:8000/docs    -> OpenAPI docs
+
+6. Frontend UI (Terminal 4)
+---------------------------
+  cd frontend
+  npm install
+  npm run dev
+
+Open http://localhost:3000/login
+Signup (any email, password 8+ chars) -> lands on /chat.
+
+7. Use it (2-min demo)
+----------------------
+1. /knowledge -> upload .txt/.pdf/.csv/.png/.mp3 (<100MB) -> wait for ready.
+2. /chat -> ask -> answer streams with [1] citations, click for quote/file/page.
+3. Re-ask same question -> cached badge, no LLM call.
+   Toggle agent mode to see RETRIEVE/GRADE/REWRITE/GENERATE nodes.
+4. /admin -> hit-rate, latency, helpfulness.
+
+Full verification (needs all services running):
+  python scripts/seed_kb.py
+  powershell -ExecutionPolicy Bypass -File scripts/demo.ps1
+    # must print DEMO 7/7 GREEN
+    # bash twin: bash scripts/demo.sh
+  python evals/run_chunk_bench.py   # -> evals/chunking_report.md
+  cd backend
+  python -m pytest tests -q         # expect 44/44
+
+Real-model smoke (needs ollama serve + pulls above):
+  python scripts/smoke04.py  # signup -> upload -> ingest -> cited chat
+
+8. After reboot / sleep
+-----------------------
+Containers auto-restart, host processes do not.
+Restart in order: ollama serve -> backend uvicorn -> frontend npm run dev.
+If UI says "Failed to fetch", curl http://localhost:8000/health first.
+
+No Celery needed locally; ingest runs in-process.
+Docker worker service is only for prod (docker compose up).
+
+9. Architecture recap (what you just started)
+--------------------------------------------
+UI (Next.js 14) -> FastAPI (/api/*, JWT) -> Postgres (users/sessions/messages),
+Qdrant (text-v1 1024d + image-v1, scope-filtered), Redis (exact+semantic cache),
+MinIO (blobs), Worker (parse->chunk->embed->index), LLM router via
+backend/app/services/llm.py (local Ollama llama3.1:8b + nomic-embed-text).
+
+Golden rule: every vector query filters scope in ('global','user:{id}').
