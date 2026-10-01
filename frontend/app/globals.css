@@ -283,6 +283,7 @@ table.docs td.num { font-family: var(--font-mono); text-align: right; }
   cursor: pointer;
 }
 .dropzone:hover { border-color: var(--accent); }
+.dropzone p { margin-left: auto; margin-right: auto; } /* prose max-width box must stay centered here */
 .dropzone.over {
   border-color: var(--accent); background: rgb(18 26 31 / 0.7);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
