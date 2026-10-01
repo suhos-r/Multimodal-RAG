@@ -1,6 +1,7 @@
 "use client";
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import ParticleField from "../../../components/particle-field";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -46,6 +47,7 @@ function LoginForm() {
 
   return (
     <main className="login-wrap">
+      <ParticleField />
       <div className="login-panel">
         <div className="brand">
           <span className="brand-mark">R</span>
@@ -84,7 +86,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<main className="login-wrap"><p className="spin">Loading</p></main>}>
+    <Suspense fallback={<main className="login-wrap"><ParticleField /><p className="spin">Loading</p></main>}>
       <LoginForm />
     </Suspense>
   );

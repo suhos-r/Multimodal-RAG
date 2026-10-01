@@ -333,8 +333,9 @@ table.docs td.num { font-family: var(--font-mono); text-align: right; }
 }
 
 /* login */
-.login-wrap { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-s); }
-.login-panel { width: 100%; max-width: 400px; background: var(--surface); border: var(--border);
+.login-wrap { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-s); position: relative; overflow: hidden; }
+.particle-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.login-panel { position: relative; z-index: 1; width: 100%; max-width: 400px; background: var(--surface); border: var(--border);
   border-radius: var(--radius); box-shadow: var(--shadow-far); padding: var(--space-l); }
 .login-panel .brand { padding: 0 0 var(--space-xs); }
 .login-panel h1 { margin-bottom: var(--space-3xs); }
