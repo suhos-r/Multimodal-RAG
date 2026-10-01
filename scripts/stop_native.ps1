@@ -13,8 +13,8 @@ if (Test-Path $PIDFILE) {
   Remove-Item $PIDFILE -Force -ErrorAction SilentlyContinue
 }
 foreach ($port in @($ApiPort, $UiPort)) {
-  $pid = (netstat -ano | Select-String "0.0.0.0:$port" | Select-Object -First 1) -replace '.*\s(\d+)\s*$', '$1'
-  if ($pid -match '^\d+$') { Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue; Write-Host "  freed port $port" }
+  $procId = (netstat -ano | Select-String "0.0.0.0:$port" | Select-Object -First 1) -replace '.*\s(\d+)\s*$', '$1'
+  if ($procId -match '^\d+$') { Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue; Write-Host "  freed port $port" }
 }
 Get-Process -Name qdrant -ErrorAction SilentlyContinue | Stop-Process -Force
 Write-Host "stopped (volumes/data files untouched)"
